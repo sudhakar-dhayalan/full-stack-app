@@ -38,9 +38,9 @@ export class PostCreateComponent implements OnInit {
               title: post.title,
               content: post.content,
             };
-            this.isLoading = false;
           },
-          (err) => console.log(err.message)
+          (err) => console.log(err.message),
+          () => (this.isLoading = false)
         );
       } else {
         this.mode = 'create';

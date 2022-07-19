@@ -16,10 +16,16 @@ export class PostListComponent implements OnInit {
   ngOnInit(): void {
     this.isLoading = true;
     this.postService.getPosts();
-    this.postService.getUpdatedPostsListner().subscribe((posts: IPost[]) => {
-      this.isLoading = false;
-      this.posts = posts;
-    });
+    this.postService.getUpdatedPostsListner().subscribe(
+      (posts: IPost[]) => {
+        this.posts = posts;
+        this.isLoading = false;
+      },
+      (err) => {
+        this.isLoading = false;
+        console.log(err);
+      }
+    );
   }
 
   onDeletePost(id: string) {
