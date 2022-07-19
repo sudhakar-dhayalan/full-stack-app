@@ -18,7 +18,7 @@ app.use((req, res, next) => {
     );
     res.setHeader(
         'Access-Control-Allow-Methods',
-        'GET, POST, OPTIONs, PATCH, DELETE'
+        'GET, POST, OPTIONS, PUT, PATCH, DELETE'
     );
     next();
 });
@@ -26,40 +26,10 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const Post = require('./models/post');
+const postsRoute = require('./routes/posts');
 
-app.post('/api/posts', (req, res, next) => {
-    const post = new Post({
-        title: req.body.title,
-        content: req.body.content
-    });
-    post.save().then(addedPost => {
-        console.log('added post succss')
-        console.log(addedPost)
-        res.status(201).json({
-            message: 'Post added successfully!!!',
-            postId: addedPost._id
-        })
-    });
-});
+app.use('/api/posts', postsRoute)
 
-app.get('/api/posts', (req, res, next) => {
-    Post.find().then(documents => {
-        console.log(documents)
-        res.status(200).json({
-            message: 'received posts successfully',
-            posts: documents
-        })
-    })
-});
-
-app.delete('/api/posts/:id', (req, res, next) => {
-    Post.deleteOne({ _id: req.params.id })
-        .then(result => {
-            console.log(result);
-            res.status(200).json({ message: "Post got deleted successfully!!!" });
-        })
-})
 module.exports = app;
 // test
 // uHnITNujS9FKdYmb

@@ -1,25 +1,28 @@
-import { Component, OnInit } from "@angular/core";
-import { IPost } from "./post.model";
-import { PostService } from "./post.service";
+import { Component, OnInit } from '@angular/core';
+import { IPost } from './post.model';
+import { PostService } from './post.service';
 
 @Component({
-    selector: 'app-post-list',
-    templateUrl: './post-list.component.html',
-    styleUrls: ['./post-list.component.scss']
+  selector: 'app-post-list',
+  templateUrl: './post-list.component.html',
+  styleUrls: ['./post-list.component.scss'],
 })
 export class PostListComponent implements OnInit {
-    posts: IPost[] = [];
+  posts: IPost[] = [];
+  isLoading = false;
 
-    constructor(private postService: PostService) {}
+  constructor(private postService: PostService) {}
 
-    ngOnInit(): void {
-        this.postService.getPosts();
-        this.postService.getUpdatedPostsListner().subscribe(
-            (posts: IPost[]) => this.posts = posts
-        )
-    }
+  ngOnInit(): void {
+    this.isLoading = true;
+    this.postService.getPosts();
+    this.postService.getUpdatedPostsListner().subscribe((posts: IPost[]) => {
+      this.isLoading = false;
+      this.posts = posts;
+    });
+  }
 
-    onDeletePost(id: string) {
-        this.postService.deletePost(id);
-    }
+  onDeletePost(id: string) {
+    this.postService.deletePost(id);
+  }
 }
