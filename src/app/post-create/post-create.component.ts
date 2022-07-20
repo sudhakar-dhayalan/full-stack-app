@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { IPost } from '../post-list/post.model';
 import { PostService } from '../post-list/post.service';
@@ -18,6 +18,7 @@ export class PostCreateComponent implements OnInit {
     content: '',
   };
   isLoading = false;
+  form!: FormGroup;
 
   constructor(
     private postService: PostService,
@@ -26,6 +27,12 @@ export class PostCreateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.form = new FormGroup({
+      title: new FormControl(null, {
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      content: new FormControl(null, { validators: [Validators.required] }),
+    });
     this.activatedRoute.paramMap.subscribe((params: ParamMap) => {
       if (params.has('postId')) {
         this.mode = 'edit';
@@ -38,6 +45,10 @@ export class PostCreateComponent implements OnInit {
               title: post.title,
               content: post.content,
             };
+            this.form.setValue({
+              title: post.title,
+              content: post.content,
+            });
           },
           (err) => console.log(err.message),
           () => (this.isLoading = false)
@@ -49,14 +60,14 @@ export class PostCreateComponent implements OnInit {
     });
   }
 
-  onSubmitPost(form: NgForm) {
-    if (form.invalid) {
+  onSubmitPost() {
+    if (this.form.invalid) {
       return;
     }
     this.isLoading = true;
     if (this.mode === 'create') {
       this.postService
-        .addPost(form.value.title, form.value.content)
+        .addPost(this.form.value.title, this.form.value.content)
         .subscribe(() => {
           this.router.navigateByUrl('');
         });
@@ -64,13 +75,13 @@ export class PostCreateComponent implements OnInit {
       this.postService
         .updatePost({
           id: this.postId,
-          title: form.value.title,
-          content: form.value.content,
+          title: this.form.value.title,
+          content: this.form.value.content,
         })
         .subscribe(() => {
           this.router.navigateByUrl('');
         });
     }
-    form.resetForm();
+    this.form.reset();
   }
 }
