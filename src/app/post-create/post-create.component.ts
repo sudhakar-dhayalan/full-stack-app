@@ -12,13 +12,9 @@ import { PostService } from '../post-list/post.service';
 export class PostCreateComponent implements OnInit {
   private mode = 'create';
   private postId: any;
-  post: IPost = {
-    id: 'a',
-    title: '',
-    content: '',
-  };
   isLoading = false;
   form!: FormGroup;
+  imagePreview = '';
 
   constructor(
     private postService: PostService,
@@ -32,6 +28,7 @@ export class PostCreateComponent implements OnInit {
         validators: [Validators.required, Validators.minLength(3)],
       }),
       content: new FormControl(null, { validators: [Validators.required] }),
+      image: new FormControl(null, { validators: [Validators.required] }),
     });
     this.activatedRoute.paramMap.subscribe((params: ParamMap) => {
       if (params.has('postId')) {
@@ -40,11 +37,6 @@ export class PostCreateComponent implements OnInit {
         this.postId = params.get('postId');
         this.postService.getPost(this.postId).subscribe(
           (post) => {
-            this.post = {
-              id: post._id,
-              title: post.title,
-              content: post.content,
-            };
             this.form.setValue({
               title: post.title,
               content: post.content,
@@ -83,5 +75,21 @@ export class PostCreateComponent implements OnInit {
         });
     }
     this.form.reset();
+  }
+
+  onImageUpload(event: Event) {
+    let files = (event.target as HTMLInputElement).files;
+    let file!: File;
+    if (files && files.length && files[0]) {
+      file = files[0];
+    }
+    this.form.patchValue({ image: file });
+    this.form.get('image')?.updateValueAndValidity();
+    console.log(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 }
