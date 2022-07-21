@@ -11,6 +11,7 @@ const MIME_TYPE = {
 };
 
 const multer = require('multer');
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const isValid = MIME_TYPE[file.mimetype];
@@ -27,7 +28,7 @@ const storage = multer.diskStorage({
     }
 });
 
-router.post('', multer(storage).single('image'), (req, res, next) => {
+router.post('', multer({ storage: storage }).single('image'), (req, res, next) => {
     const post = new Post({
         title: req.body.title,
         content: req.body.content
@@ -37,7 +38,9 @@ router.post('', multer(storage).single('image'), (req, res, next) => {
         console.log(addedPost)
         res.status(201).json({
             message: 'Post added successfully!!!',
-            postId: addedPost._id
+            postId: addedPost._id,
+            title: addedPost.title,
+            content: addedPost.content,
         })
     });
 });
