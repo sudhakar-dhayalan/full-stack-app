@@ -43,6 +43,7 @@ export class PostCreateComponent implements OnInit {
             this.form.setValue({
               title: post.title,
               content: post.content,
+              image: post.imagePath,
             });
           },
           (err) => console.log(err.message),
@@ -68,7 +69,7 @@ export class PostCreateComponent implements OnInit {
           this.form.value.image
         )
         .subscribe(() => {
-          this.router.navigateByUrl('');
+          this.router.navigate(['/']);
         });
     } else {
       this.postService
@@ -76,9 +77,10 @@ export class PostCreateComponent implements OnInit {
           id: this.postId,
           title: this.form.value.title,
           content: this.form.value.content,
+          imagePath: this.form.value.imagePath,
         })
         .subscribe(() => {
-          this.router.navigateByUrl('');
+          this.router.navigate(['/']);
         });
     }
     this.form.reset();

@@ -21,6 +21,7 @@ export class PostService {
               id: post._id,
               title: post.title,
               content: post.content,
+              imagePath: post.imagePath,
             };
           });
         })
@@ -43,24 +44,23 @@ export class PostService {
     const postData = new FormData();
     postData.append('title', title);
     postData.append('content', content);
-    postData.append('image', image, title.slice(15));
+    postData.append('image', image, title.slice(0, 15));
     return this.http
       .post<{
         message: string;
-        postId: string;
-        content: string;
-        title: string;
+        post: IPost;
       }>('http://localhost:3000/api/posts', postData)
       .pipe(
         map((res) => {
           const post = {
-            id: res.postId,
-            content: res.content,
-            title: res.title,
+            id: res.post.id,
+            content: content,
+            title: title,
+            imagePath: res.post?.imagePath,
           };
           this.posts.push(post);
           this.postsUpdated.next([...this.posts]);
-          console.log(res.postId);
+          console.log(res.post.id);
         })
       );
   }
@@ -70,6 +70,7 @@ export class PostService {
       _id: string;
       title: string;
       content: string;
+      imagePath: string;
     }>('http://localhost:3000/api/posts/' + id);
     // const post = this.posts.find(po => po.id === id)
     // if (post && post.id) {
